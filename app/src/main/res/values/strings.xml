@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AppCrawler</string>
+    <string name="accessibility_service_description">Automated App Crawing and Analyzing</string>
+</resources>

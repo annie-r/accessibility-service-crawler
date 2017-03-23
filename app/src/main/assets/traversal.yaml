@@ -1,0 +1,15 @@
+---
+commands:
+  - type: text
+    x_coord: 290
+    y_coord: 2300
+    content: this is a test
+#command:
+#  - type: click
+#    x_coord: 725
+#    y_coord: 700
+#  - type: wait
+#    duration: 5000
+#  - type: click
+#    x_coord: 235
+#    y_coord: 2475
