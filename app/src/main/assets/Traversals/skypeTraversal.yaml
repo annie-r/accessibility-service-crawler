@@ -1,0 +1,10 @@
+id: "Skype"
+commands:
+  - type: scan
+  - type: text
+    content: app.accessibility.tester@gmail.com
+    x_coord: 505
+    y_coord: 945
+  - type: click
+    x_coord: 715
+    y_coord: 1040

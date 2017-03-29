@@ -16,30 +16,35 @@ import android.content.res.AssetManager;
 
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import android.os.Bundle;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 import java.io.InputStreamReader;
-import java.io.FileReader;
 import java.util.Map;
 import java.util.ArrayList;
-import android.os.CountDownTimer;
+
 /**
  * Created by annieross on 3/16/17.
  */
 
 public class Crawler extends AccessibilityService {
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+    private String app_name = "Test";
     private static final String TAG = "Crawler";
     private BroadcastReceiver receiver_crawl;
     private final float back_x = 330;
     private final float back_y = 2480;
     private class Scanner{
-        public final float scan_x=1270;
-        public final float scan_y=252;
-        public final long wait_millis = 5000;
+        public final float scan_x=725;
+        public final float scan_y=670;
+        public final long wait_millis = 10000;
         public final float share_x=1200;
         public final float share_y=180;
-        public final float drive_x=1225;
-        public final float drive_y=1688;
+        public final float drive_x=1219;
+        public final float drive_y=1709;
+        public final float title_x=200;
+        public final float title_y= 475;
         public final float save_x=1270;
         public final float save_y=2320;
     };
@@ -57,6 +62,9 @@ public class Crawler extends AccessibilityService {
 
     }
 
+    /* broadcast command
+        adb shell am broadcast -a crawler.startCrawl --es traversalFile <fileName in app/assets/traversals> --es appName <app Name>
+         */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,7 +77,12 @@ public class Crawler extends AccessibilityService {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.i(TAG, "broadcast start crawl");
-                startCrawl();
+                String traversal_file = intent.getStringExtra("traversalFile");
+                app_name = intent.getStringExtra("appName");
+                if(app_name == null){
+                    app_name = "Unknown";
+                }
+                startCrawl(traversal_file);
             }
         };
         this.registerReceiver(receiver_crawl, filter_crawl);
@@ -92,7 +105,7 @@ public class Crawler extends AccessibilityService {
         screenshot
 
      */
-    public void startCrawl(){
+    public void startCrawl(String traversalFile){
         Log.i(TAG, "startCrawl");
 
         try {
@@ -102,8 +115,9 @@ public class Crawler extends AccessibilityService {
                 System.out.println(files[i]);
             }
             Log.i(TAG, "file: "+files[0]);
+            Log.i(TAG, "travFile: "+traversalFile);
 
-            YamlReader reader = new YamlReader(new InputStreamReader(assetsManager.open("traversal.yaml")));
+            YamlReader reader = new YamlReader(new InputStreamReader(assetsManager.open("Traversals/"+traversalFile)));
             while(true) {
                 Map step = (Map) reader.read();
                 if (step == null) break;
@@ -141,8 +155,7 @@ public class Crawler extends AccessibilityService {
 
             }
         } catch (Exception e){
-            Log.e(TAG, "no file");
-            System.out.println(e);
+            Log.e(TAG, e.toString());
         }
 
     }
@@ -208,9 +221,14 @@ public class Crawler extends AccessibilityService {
         appWait(scanner.wait_millis);
         click(scanner.drive_x,scanner.drive_y);
         appWait(scanner.wait_millis);
+        //label output
+        Timestamp ts = new Timestamp(System.currentTimeMillis());
+        String label = app_name + "."+ sdf.format(ts);
+        enterText(label, (int) scanner.title_x, (int) scanner.title_y);
         click(scanner.save_x,scanner.save_y);
         appWait(scanner.wait_millis);
         click(back_x,back_y);
         appWait(scanner.wait_millis);
+        Log.i(TAG, "end scan");
     }
 }

@@ -1,0 +1,14 @@
+Accessibility Scanner 1.1.2 for Android 6.0+ APK Download
+Version: 1.1.2 (20) for Android 6.0+ (M, API 23)
+Update on: 2017-03-02
+Signature: 18bfabb0de1de24436f16b4968899bcd3418e3ce  Accessibility Scanner 1.1.2(20) apk safe verified
+APK File SHA1: d02c4fb0737241131c383aedf6967f54e5539517
+What's new:
+Updates in version 1.1:
+
+• Support for 39 additional languages
+• Scan results can be exported as ZIP archives to Google Drive
+• Scan results can be deleted from the history list
+• Bug fixes and other enhancements
+
+Downloaded 3/23/2017

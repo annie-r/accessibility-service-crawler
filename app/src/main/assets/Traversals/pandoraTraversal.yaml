@@ -1,0 +1,85 @@
+id: "Pandora"
+commands:
+#  #Forgot PW
+#  - type: scan
+#  - type: wait
+#    duration: 15000
+#  - type: click
+#    x_coord: 695
+#    y_coord: 1675
+#  - type: wait
+#    duration: 10000
+#  - type: scan
+#  #- type: wait
+#  #  duration: 10000
+#  - type: text
+#    content: app.accessibility.tester@gmail.com
+#    x_coord: 300
+#    y_coord: 820
+#  - type: wait
+#    duration: 10000
+#  - type: click
+#    x_coord: 520
+#    y_coord: 1095
+#  - type: wait
+#    duration: 10000
+# # - type: scan
+#  - type: wait
+#    duration: 15000
+#  - type: click
+#    x_coord: 610
+#    y_coord: 2320
+#  #Log-In
+  - type: scan
+  - type: text
+    content: app.accessibility.tester@gmail.com
+    x_coord: 400
+    y_coord: 1040
+  - type: wait
+    duration: 8000
+  - type: text
+    content: th1s1smIp@sswrd
+    x_coord: 37
+    y_coord: 1220
+  - type: wait
+    duration: 8000
+  - type: click
+    x_coord: 480
+    y_coord: 1490
+  - type: wait
+    duration: 10000
+  - type: scan
+#  #Create Station
+#  - type: click
+#    x_coord: 290
+#    y_coord: 620
+#  - type: scan
+#  - type: text
+#    content: big band
+#    x_coord: 150
+#    y_coord: 415
+#  - type: scan
+#  - type: click
+#    x_coord: 255
+#    y_coord: 700
+#  #Play/Pause
+#  - type: scan
+#  - type: click
+#    x_coord: 255
+#    y_coord: 700
+#  - type: scan
+#  #Settings
+#  - type: click
+#    x_coord: 100
+#    y_coord: 220
+#  - type: scan
+#  - type: click
+#    x_coord: 120
+#    y_coord: 230
+#  - type: scan
+#  - type: click
+#    x_coord: 333
+#    y_coord: 990
+#  - type: scan
+#  #Sign Out
+#
