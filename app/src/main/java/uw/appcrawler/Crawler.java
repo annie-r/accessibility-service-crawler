@@ -32,13 +32,22 @@ public class Crawler extends AccessibilityService {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
     private String app_name = "Test";
     private static final String TAG = "Crawler";
-    private BroadcastReceiver receiver_crawl;
-    private final float back_x = 330;
-    private final float back_y = 2480;
+    private BroadcastReceiver receiver_setApp;
+    private BroadcastReceiver receiver_click;
+    private BroadcastReceiver receiver_enterText;
+    //private BroadcastReceiver receiver_wait;
+    private final int[] back_coords = new int[] {330,2480};
     private class Scanner{
+        private final int[] scan_coords = new int[] {725,670};
+        private final int[] share_coords = new int[] {1200,180};
+        private final int[] drive_coords = new int[] {1220,1710};
+        private final int[] title_coords = new int[] {200,475};
+        private final int[] save_coords = new int[] {1270,2320};
+        public final long wait_millis = 10000;
+        /*
         public final float scan_x=725;
         public final float scan_y=670;
-        public final long wait_millis = 10000;
+
         public final float share_x=1200;
         public final float share_y=180;
         public final float drive_x=1219;
@@ -47,6 +56,7 @@ public class Crawler extends AccessibilityService {
         public final float title_y= 475;
         public final float save_x=1270;
         public final float save_y=2320;
+        */
     };
     private final Scanner scanner = new Scanner();
 
@@ -63,14 +73,14 @@ public class Crawler extends AccessibilityService {
     }
 
     /* broadcast command
-        adb shell am broadcast -a crawler.startCrawl --es traversalFile <fileName in app/assets/traversals> --es appName <app Name>
+
          */
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate");
 
-
+        /* //adb shell am broadcast -a crawler.startCrawl --es traversalFile <fileName in app/assets/traversals> --es appName <app Name>
         final IntentFilter filter_crawl = new IntentFilter();
         filter_crawl.addAction("crawler.startCrawl");
         receiver_crawl = new BroadcastReceiver() {
@@ -86,13 +96,83 @@ public class Crawler extends AccessibilityService {
             }
         };
         this.registerReceiver(receiver_crawl, filter_crawl);
+        */
+
+        //Set App
+        final IntentFilter filter_setApp = new IntentFilter();
+        filter_setApp.addAction("crawler.setApp");
+        receiver_setApp = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "broadcast set app");
+                app_name = intent.getStringExtra("appName");
+                if(app_name == null){
+                    app_name = "Unknown";
+                }
+            }
+        };
+        this.registerReceiver(receiver_setApp, filter_setApp);
+
+        //CLICK
+        //adb shell am broadcast -a crawler.click --eia coords <x_coord>,<y_coord>
+        final IntentFilter filter_click = new IntentFilter();
+        filter_click.addAction("crawler.click");
+        receiver_click = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "broadcast start click");
+                int[] coords = new int [2];
+                coords = intent.getIntArrayExtra("coords");
+                click(coords);
+            }
+        };
+        this.registerReceiver(receiver_click, filter_click);
+
+        //TEXT
+        //adb shell am broadcast -a crawler.enterText --eia coords <x_coord>,<y_coord> --es text <text>
+        final IntentFilter filter_enterText = new IntentFilter();
+        filter_enterText.addAction("crawler.enterText");
+        receiver_enterText = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "broadcast enter text");
+                int[] coords = new int [2];
+                coords = intent.getIntArrayExtra("coords");
+                String content = intent.getStringExtra("text");
+                Log.i(TAG, "added "+content+" at: "+coords[0]+","+coords[1]);
+                enterText(content, coords);
+            }
+        };
+        this.registerReceiver(receiver_enterText, filter_enterText);
+
+        /*
+        //WAIT
+        final IntentFilter filter_crawl = new IntentFilter();
+        filter_crawl.addAction("crawler.startCrawl");
+        receiver_crawl = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "broadcast start crawl");
+                String traversal_file = intent.getStringExtra("traversalFile");
+                app_name = intent.getStringExtra("appName");
+                if(app_name == null){
+                    app_name = "Unknown";
+                }
+                startCrawl(traversal_file);
+            }
+        };
+        this.registerReceiver(receiver_crawl, filter_crawl);
+        */
 
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(receiver_crawl);
+        this.unregisterReceiver(receiver_enterText);
+        this.unregisterReceiver(receiver_click);
+        //this.unregisterReceiver(receiver_wait);
+        this.unregisterReceiver(receiver_setApp);
     }
 
     /*
@@ -105,6 +185,7 @@ public class Crawler extends AccessibilityService {
         screenshot
 
      */
+    /*
     public void startCrawl(String traversalFile){
         Log.i(TAG, "startCrawl");
 
@@ -158,12 +239,14 @@ public class Crawler extends AccessibilityService {
             Log.e(TAG, e.toString());
         }
 
-    }
+    }*/
 
-    private void enterText(String content, int x_coord, int y_coord){
-        Log.i(TAG, "entering text: "+content+" at location: "+x_coord+","+y_coord);
+    private void enterText(String content, int[] coords){
+        int x = coords[0];
+        int y = coords[1];
+        Log.i(TAG, "entering text: "+content+" at location: "+x+","+y);
         ArrayList<AccessibilityNodeInfo> nodes = new ArrayList<>();
-        getAccessibilityNodeByLocation(x_coord, y_coord, getRootInActiveWindow(), nodes);
+        getAccessibilityNodeByLocation(x, y, getRootInActiveWindow(), nodes);
         for(AccessibilityNodeInfo node: nodes){
             Log.i(TAG, "node class name: "+node.getClassName());
             if(node != null & node.getClassName().equals("android.widget.EditText")){
@@ -202,7 +285,9 @@ public class Crawler extends AccessibilityService {
         }
     }
 
-    private void click(float x, float y){
+    private void click(int[] coords){
+        int x = coords[0];
+        int y = coords[1];
         Log.i(TAG, "clicking: "+x+","+y);
         Path click = new Path();
         click.moveTo(x,y);
@@ -215,19 +300,19 @@ public class Crawler extends AccessibilityService {
     }
 
     private void scan(){
-        click(scanner.scan_x, scanner.scan_y);
+        click(scanner.scan_coords);
         appWait(scanner.wait_millis);
-        click(scanner.share_x,scanner.share_y);
+        click(scanner.share_coords);
         appWait(scanner.wait_millis);
-        click(scanner.drive_x,scanner.drive_y);
+        click(scanner.drive_coords);
         appWait(scanner.wait_millis);
         //label output
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         String label = app_name + "."+ sdf.format(ts);
-        enterText(label, (int) scanner.title_x, (int) scanner.title_y);
-        click(scanner.save_x,scanner.save_y);
+        enterText(label, scanner.title_coords);
+        click(scanner.save_coords);
         appWait(scanner.wait_millis);
-        click(back_x,back_y);
+        click(back_coords);
         appWait(scanner.wait_millis);
         Log.i(TAG, "end scan");
     }
