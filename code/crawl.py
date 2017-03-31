@@ -1,8 +1,6 @@
 import time, sys, os.path, os
 import subprocess #for running monkey command to start app with package name alone
-print sys.path
 sys.path.append(os.path.join('/usr/lib/python2.7/dist-packages/'))
-print sys.path
 import yaml
 
 def yaml_loader(filepath):
@@ -32,7 +30,7 @@ def start_app(device, app_info):
 	#print runComponent
 	#runComponent = 'com.skype.raider/.Main'
 	#device.startActivity(component=runComponent)
-
+'''
 def check_valid_screen(compImage):
 	refFailScreensDir = './logs/failScreens'
 	ref_x=0
@@ -48,6 +46,7 @@ def check_valid_screen(compImage):
 			return 1
 	print "didn't match a fail screen from: " + str(refFailScreensDir)
 	return 0
+'''
 
 def bashCall(bashCommand):
 	print "bash Call: "+bashCommand
@@ -128,22 +127,30 @@ if __name__ == "__main__":
 					print "click"
 					coords = traversal_step['coords']
 					print "coords: "+str(traversal_step['coords']) 
-					bashCommand = "adb shell am broadcast -a crawler.click --eia coords "+coords[0]+","+coords[1]
+					bashCommand = "adb shell am broadcast -a crawler.click --eia coords "+str(coords[0])+","+str(coords[1])
 					bashCall(bashCommand)
 				###############
 				## TEXT ENTRY ############
 				elif traversal_step['type'] == "text_entry":
 					text = traversal_step['text']
 					coords = traversal_step['coords']
-					print "entering "+text+" at: "+coords[0]+","+coords[1]
-					bashCommand = "adb shell am broadcast -a crawler.enterText --eia coords "+coords[0]+","+coords[1]+" --es text "+text
+					print "entering "+text+" at: "+str(coords[0])+","+str(coords[1])
+					bashCommand = "adb shell am broadcast -a crawler.enterText --eia coords "+str(coords[0])+","+str(coords[1])+" --es text "+text
 					bashCall(bashCommand)
 				########
 				## WAIT ################
 				elif traversal_step['type'] == "wait":
 					print "wait"
-					time.sleep(traversal_step['time'])
-				##########################
+					time.sleep(traversal_step['duration'])
+				## GOOGLE SCANNER CAPTURE
+				elif traversal_step['type'] == "scan":
+					print "scan"
+					bashCommand = "adb shell am broadcast -a crawler.scan"
+					bashCall(bashCommand);
+    			else:
+    				print "unknown type"
+    				print traversal_step['type']
+    			##########################
 				## DRAG #####
 				'''
 				elif traversal_step['type'] == "drag":
@@ -161,14 +168,6 @@ if __name__ == "__main__":
 					count=count+1
 				'''
 				#####
-				## GOOGLE SCANNER CAPTURE
-				elif traversal_step['type'] == "scan":
-					print "scan"
-					bashCommand = "adb shell am broadcast -a crawler.scan"
-					bashCall(bashCommand);
-    			else:
-    				print "unknown type"
-    				print traversal_step['type']
     		print "end of for"
     	print "end of commands"
 	print "just traversal_info:"

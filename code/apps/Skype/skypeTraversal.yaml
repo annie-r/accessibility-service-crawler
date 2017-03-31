@@ -1,0 +1,23 @@
+#Skype
+credentials: &credentials
+    username: &username application_tester
+    password: &password th1s1smIp@sswrd
+    email: &email app.accessibility.tester@gmail.com
+
+traversal: &traversal
+    id: "Skype"
+    commands:
+        - type: set_app
+          app: Skype
+        - type: wait
+          duration: 5
+        #- type: scan
+        - type: text_entry
+          text: *email
+          coords: !!python/tuple [505,945]
+        - type: wait
+          duration: 10
+        - type: click
+          coords: !!python/tuple [715,1300]
+        #- type: scan
+
