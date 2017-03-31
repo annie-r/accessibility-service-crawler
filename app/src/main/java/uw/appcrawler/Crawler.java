@@ -30,11 +30,12 @@ import java.util.ArrayList;
 public class Crawler extends AccessibilityService {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-    private String app_name = "Test";
+    private String app_name = "Unknown";
     private static final String TAG = "Crawler";
     private BroadcastReceiver receiver_setApp;
     private BroadcastReceiver receiver_click;
     private BroadcastReceiver receiver_enterText;
+    private BroadcastReceiver receiver_scan;
     //private BroadcastReceiver receiver_wait;
     private final int[] back_coords = new int[] {330,2480};
     private class Scanner{
@@ -98,7 +99,8 @@ public class Crawler extends AccessibilityService {
         this.registerReceiver(receiver_crawl, filter_crawl);
         */
 
-        //Set App
+        //SET APP
+        //adb shell am broadcast -a crawler.setApp --es appName <app name>
         final IntentFilter filter_setApp = new IntentFilter();
         filter_setApp.addAction("crawler.setApp");
         receiver_setApp = new BroadcastReceiver() {
@@ -144,6 +146,19 @@ public class Crawler extends AccessibilityService {
             }
         };
         this.registerReceiver(receiver_enterText, filter_enterText);
+
+        //SCAN
+        //adb shell am broadcast -a crawler.scan
+        final IntentFilter filter_scan = new IntentFilter();
+        filter_scan.addAction("crawler.scan");
+        receiver_scan = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "broadcast scan");
+                scan();
+            }
+        };
+        this.registerReceiver(receiver_scan, filter_scan);
 
         /*
         //WAIT
